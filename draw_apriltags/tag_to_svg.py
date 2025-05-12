@@ -96,6 +96,8 @@ def gen_apriltag_svg(width, height, pixel_array, size):
     for _y in range(height):
         for _x in range(width):
             svg_text += gen_gridsquare(_x, _y, pixel_array[_x, _y])
+
+    svg_text += f'\t<rect width="{width}" height="{height}" x="0" y="0" fill-opacity="0" stroke="grey" stroke-width="0.1" stroke-dasharray="2 1" stroke-opacity="0.2" />\n'
     svg_text += '</svg>\n'
 
     return svg_text
