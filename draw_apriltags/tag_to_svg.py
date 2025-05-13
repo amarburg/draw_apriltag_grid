@@ -2,55 +2,29 @@
 #
 # Copied from [apriltag-img](https://github.com/AprilRobotics/apriltag-imgs) repo
 
-import os
-import sys
 
 from PIL import Image
 from pathlib import Path
 
-# # Thanks to https://stackoverflow.com/a/54547257
-# def dir_path(file_path):
-#     if os.path.isfile(file_path):
-#         return file_path
-#     else:
-#         raise argparse.ArgumentTypeError(f'Supplied argument "{file_path}" is not a valid file path.')
 
+def make_tag_file_name(id, family):
+    """ """
 
-# parser = argparse.ArgumentParser()
-# parser = argparse.ArgumentParser(
-#     description='A script to convert pre-generated apriltag .png files into SVG format.',
-#     epilog='Example: "python tag_to_svg.py tagStandard52h13/tag52_13_00007.png tag52_13_00007.svg --size=20mm"'
-# )
-# parser.add_argument(
-#     'tag_file', type=dir_path, 
-#     help='The path to the apriltag png you want to convert.'
-# )
-# parser.add_argument(
-#     'out_file', type=str, 
-#     help='The path to the SVG output file.'
-# )
-# parser.add_argument(
-#     '--size', type=str, required=False, default='20mm', dest="svg_size", 
-#     help='The size (edge length) of the generated svg such as "20mm" "2in" "20px"'
-# )
-# # TODO add support for a blank margin around the tag
-# # parser.add_argument(
-# #     '--margin', type=int, required=False, default='0', dest="tag_margin", 
-# #     help='The size (in grid squares) of the white margin around the apriltag'
-# # )/
+    # Check for submodule
+    if not (Path("apriltag-imgs") / "tag_to_svg.py").exists():
+        raise ValueError(
+            "apriltag-imgs/tag_to_svg.py doesn't exist.  Is the submodule checked out?"
+        )
 
-def make_file_name(id, family):
-
-
-    p = Path('apriltag-imgs') / family  
+    p = Path("apriltag-imgs") / family
 
     if not p.is_dir():
         raise ValueError(f"Family directory {p} doesn't exist")
 
     # Family name is part of tag name...
-    if family in ['tag16h5', 'tag25h9','tag36h11']:
+    if family in ["tag16h5", "tag25h9", "tag36h11"]:
         fname = f"{family.replace('h', '_0')}_{id:05d}.png"
-        
+
         tag_file = p / fname
         if not tag_file.exists():
             raise ValueError(f"Can't find tag file {tag_file}")
@@ -58,37 +32,35 @@ def make_file_name(id, family):
     else:
         raise ValueError(f"Can't create file names for family {family}")
 
-
     return tag_file
 
-def make_tag_svg(id, family, svg_size):
 
-    tag_file = make_file_name(id,family)
+def make_tag_svg(id, family, svg_size):
+    tag_file = make_tag_file_name(id, family)
 
     if tag_file is None:
         raise ValueError("Couldn't find tag file")
 
-    with Image.open(tag_file, 'r') as im:
-
+    with Image.open(tag_file, "r") as im:
         width, height = im.size
         pix_vals = im.load()
-        
+
         apriltag_svg = gen_apriltag_svg(width, height, pix_vals, svg_size)
 
     return apriltag_svg
+
 
 def gen_apriltag_svg(width, height, pixel_array, size):
     def gen_rgba(rbga):
         (_r, _g, _b, _raw_a) = rbga
         _a = _raw_a / 255
-        return f'rgb({_r}, {_g}, {_b})'
+        return f"rgb({_r}, {_g}, {_b})"
 
-#        return f'rgba({_r}, {_g}, {_b}, {_a})'
-
+    #        return f'rgba({_r}, {_g}, {_b}, {_a})'
 
     def gen_gridsquare(row_num, col_num, pixel):
         _rgba = gen_rgba(pixel)
-        _id = f'box{row_num}-{col_num}'
+        _id = f"box{row_num}-{col_num}"
         return f'\t<rect width="1" height="1" x="{row_num}" y="{col_num}" fill="{_rgba}" id="{_id}"/>\n'
 
     svg_text = '<?xml version="1.0" standalone="yes"?>\n'
@@ -98,9 +70,10 @@ def gen_apriltag_svg(width, height, pixel_array, size):
             svg_text += gen_gridsquare(_x, _y, pixel_array[_x, _y])
 
     svg_text += f'\t<rect width="{width}" height="{height}" x="0" y="0" fill-opacity="0" stroke="grey" stroke-width="0.1" stroke-dasharray="2 1" stroke-opacity="0.2" />\n'
-    svg_text += '</svg>\n'
+    svg_text += "</svg>\n"
 
     return svg_text
+
 
 # def main():
 #     args = parser.parse_args()
@@ -115,7 +88,7 @@ def gen_apriltag_svg(width, height, pixel_array, size):
 
 #         width, height = im.size
 #         pix_vals = im.load()
-        
+
 #         apriltag_svg = gen_apriltag_svg(width, height, pix_vals, svg_size)
 
 #     assert apriltag_svg is not None, 'Error: Failed to create SVG.'

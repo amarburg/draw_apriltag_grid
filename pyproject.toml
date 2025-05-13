@@ -5,8 +5,8 @@ description = "Default template for PDM package"
 authors = [
     {name = "Aaron Marburg", email = "amarburg@uw.edu"},
 ]
-dependencies = ["pillow>=11.2.1", "fpdf2>=2.8.3", "numpy>=2.0.2"]
-requires-python = "==3.9.*"
+dependencies = ["pillow>=11.2.1", "fpdf2>=2.8.3"]
+requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "MIT"}
 
@@ -14,5 +14,6 @@ license = {text = "MIT"}
 make-apriltag-sheet = "draw_apriltags.make_apriltag_sheet:entrypoint"
 
 
-[tool.pdm]
-distribution = true
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
