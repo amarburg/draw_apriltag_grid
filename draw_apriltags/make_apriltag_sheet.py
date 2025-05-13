@@ -40,7 +40,7 @@ def entrypoint():
     pdf = fpdf.FPDF(unit="in", format=(8.5, 11))
     pdf.add_page()
 
-    # pdf.set_font('Helvetica', size=12)
+    pdf.set_font("Helvetica", size=12)
     # pdf.cell(text="Hello world!")
 
     tag_size = None
@@ -82,7 +82,5 @@ def entrypoint():
             paths.transform = paths.transform @ fpdf.drawing.Transform.translation(
                 tag_origin[0], tag_origin[1]
             )
-
-            pdf.draw_path(paths)
 
     pdf.output(args.output)

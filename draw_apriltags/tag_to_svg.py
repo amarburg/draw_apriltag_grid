@@ -50,12 +50,13 @@ def make_tag_svg(id, family, svg_size):
     return apriltag_svg
 
 
-def gen_apriltag_svg(width, height, pixel_array, size):
+def gen_apriltag_svg(width, height, pixel_array, size, draw_outline=True):
     def gen_rgba(rbga):
         (_r, _g, _b, _raw_a) = rbga
         _a = _raw_a / 255
         return f"rgb({_r}, {_g}, {_b})"
 
+    # fpdf can't handle rgba?
     #        return f'rgba({_r}, {_g}, {_b}, {_a})'
 
     def gen_gridsquare(row_num, col_num, pixel):
@@ -65,38 +66,14 @@ def gen_apriltag_svg(width, height, pixel_array, size):
 
     svg_text = '<?xml version="1.0" standalone="yes"?>\n'
     svg_text += f'<svg width="{size}" height="{size}" viewBox="0,0,{width},{height}" xmlns="http://www.w3.org/2000/svg">\n'
+
     for _y in range(height):
         for _x in range(width):
             svg_text += gen_gridsquare(_x, _y, pixel_array[_x, _y])
 
-    svg_text += f'\t<rect width="{width}" height="{height}" x="0" y="0" fill-opacity="0" stroke="grey" stroke-width="0.1" stroke-dasharray="2 1" stroke-opacity="0.2" />\n'
+    if draw_outline:
+        svg_text += f'\t<rect width="{width}" height="{height}" x="0" y="0" fill-opacity="0" stroke="grey" stroke-width="0.1" stroke-dasharray="2 1" stroke-opacity="0.2" />\n'
+
     svg_text += "</svg>\n"
 
     return svg_text
-
-
-# def main():
-#     args = parser.parse_args()
-#     tag_file = args.tag_file
-#     out_file = args.out_file
-#     svg_size = args.svg_size
-#     # tag_margin = args.tag_margin #TODO no support for margin yet
-
-#     apriltag_svg = None
-
-#     with Image.open(tag_file, 'r') as im:
-
-#         width, height = im.size
-#         pix_vals = im.load()
-
-#         apriltag_svg = gen_apriltag_svg(width, height, pix_vals, svg_size)
-
-#     assert apriltag_svg is not None, 'Error: Failed to create SVG.'
-
-#     with open(out_file, 'w') as fp:
-#         fp.write(apriltag_svg)
-
-#     print(f'Output SVG file: {out_file} with size: {svg_size}')
-
-# if __name__ == "__main__":
-#     main()
